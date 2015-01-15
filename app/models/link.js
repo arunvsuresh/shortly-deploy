@@ -13,38 +13,15 @@ var linkSchema = mongoose.Schema({
     createdAt: Date
 });
 
-linkSchema.on('init', function (model) {
-  console.log(model.url);
-   model.visits = 0;
-   var shasum = crypto.createHash('sha1');
-   shasum.update(model.url);
-   model.code = shasum.digest('hex').slice(0, 5);
+linkSchema.pre('save', function (next) {
+  this.visits = 0;
+  var shasum = crypto.createHash('sha1');
+  shasum.update(this.url);
+  this.code = shasum.digest('hex').slice(0, 5);
+  next();
 });
 
 var Link = mongoose.model('Link', linkSchema)
-
-
-
-
-// var Link = db.Model.extend({
-//   tableName: 'urls',
-//   hasTimestamps: true,
-//   defaults: {
-//     visits: 0
-//   },
-//   initialize: function(){
-//     this.on('creating', function(model, attrs, options){
-//       var shasum = crypto.createHash('sha1');
-//       shasum.update(model.get('url'));
-//       model.set('code', shasum.digest('hex').slice(0, 5));
-//     });
-//   }
-// });
-
-var link = new Link({id: 1, url:'google.com', base_url: 'www.google.com', title: 'Google', createdAt: 'January'});
-link.save(function (err, link) {
-  if (!err) console.log('saved!')
-});
 
 
 module.exports = Link;
